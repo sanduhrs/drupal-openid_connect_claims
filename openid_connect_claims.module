@@ -28,7 +28,7 @@ function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $
       'picture' => '',
       'website' => '',
       'gender' => '',
-      'birthdate' => '0000',
+      'birthdate' => $account->get('field_birthdate')->first()->getString(),
       'zoneinfo' => $account->getTimeZone(),
       'locale' => $account->getPreferredLangcode(),
       'updated_at' => (int) $account->getChangedTime(),
@@ -65,8 +65,8 @@ function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $
   if (in_array('phone', $requested_scopes)) {
     $claims += [
       // @todo Make this field configurable.
-      //'phone_number' => '',
-      //'phone_number_verified' => '',
+      'phone_number' => $account->get('field_phone_number')->first()->getString(),
+      'phone_number_verified' => (bool) $account->get('field_phone_number_verified')->getValue(),
     ];
   }
 
