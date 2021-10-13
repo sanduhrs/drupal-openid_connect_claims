@@ -10,8 +10,15 @@ use Drupal\file\Entity\File;
 
 /**
  * Implements hook_oauth2_server_user_claims().
+ *
+ * @param $context
+ *   - 'claims': contains a referenced array of claims.
+ *   - 'account': contains the requesting account.
+ *   - 'requested_scopes': contains the requested scopes.
+ *
+ * @throws \Drupal\Core\TypedData\Exception\MissingDataException
  */
-function openid_connect_claims_oauth2_server_user_claims(array &$context) {
+function openid_connect_claims_oauth2_server_user_claims(&$context) {
   /** @var \Drupal\user\UserInterface $account */
   $account = $context['account'];
   $user_sub_property = \Drupal::config('oauth2_server')->get('user_sub_property');
@@ -35,7 +42,7 @@ function openid_connect_claims_oauth2_server_user_claims(array &$context) {
   // phone_number, phone_number_verified
   // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
 
-  return [
+  $context['claims'] = [
     'sub' => $account->get($user_sub_property),
     'name' => $account->getDisplayName(),
     // @todo Make this field configurable.
