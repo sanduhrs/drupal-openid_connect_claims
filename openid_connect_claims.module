@@ -37,7 +37,7 @@ function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $
 
   // The email scope.
   // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
-  if (in_array('profile', $requested_scopes)) {
+  if (in_array('email', $requested_scopes)) {
     $claims += [
       'email' => $account->getEmail(),
       'email_verified' => \Drupal::config('user.settings')->get('verify_mail'),
@@ -46,17 +46,17 @@ function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $
 
   // The address scope.
   // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
-  if (in_array('profile', $requested_scopes)) {
+  if (in_array('address', $requested_scopes)) {
     $claims += [
       // @todo Make this field configurable.
-      //'address' => [
-      //  'formatted' => '',
+      'address' => [
+        'formatted' => $account->get('field_address')->first()->getString(),
       //  'street_address' => '',
       //  'locality' => '',
       //  'region' => '',
       //  'postal_code' => '',
       //  'country' => '',
-      //],
+      ],
     ];
   }
 
