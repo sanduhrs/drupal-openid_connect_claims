@@ -1,0 +1,6 @@
+name: OpenID Connect Claims
+type: module
+description: The claims needed for OpenID Connect compliance.
+package: User authentication
+core: 8.x
+core_version_requirement: ^8 || ^9
