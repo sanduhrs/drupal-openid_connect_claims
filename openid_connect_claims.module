@@ -27,7 +27,7 @@ function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $
       'preferred_username' => $account->getAccountName(),
       'profile' => $account->toUrl('canonical', ['absolute' => TRUE]),
       // @todo Make these fields configurable.
-      'picture' => '',
+      //'picture' => '',
       //'website' => '',
       //'gender' => '',
       //'birthdate' => '',
@@ -64,7 +64,7 @@ function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $
 
   // The phone scope.
   // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
-  if (in_array('profile', $requested_scopes)) {
+  if (in_array('phone', $requested_scopes)) {
     $claims += [
       // @todo Make this field configurable.
       //'phone_number' => '',
