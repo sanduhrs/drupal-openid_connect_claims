@@ -20,20 +20,20 @@ function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $
     $claims += [
       'email' => $account->getEmail(),
       // @todo Make these fields configurable.
-      //'family_name' => '',
-      //'given_name' => '',
-      //'middle_name' => '',
+      'family_name' => '',
+      'given_name' => '',
+      'middle_name' => '',
       'nickname' => $account->getAccountName(),
       'preferred_username' => $account->getAccountName(),
-      'profile' => $account->toUrl('canonical', ['absolute' => TRUE]),
+      'profile' => $account->toUrl('canonical', ['absolute' => TRUE])->toString(),
       // @todo Make these fields configurable.
-      //'picture' => '',
-      //'website' => '',
-      //'gender' => '',
-      //'birthdate' => '',
+      'picture' => '',
+      'website' => '',
+      'gender' => '',
+      'birthdate' => '0000',
       'zoneinfo' => $account->getTimeZone(),
       'locale' => $account->getPreferredLangcode(),
-      'updated_at' => $account->getChangedTime(),
+      'updated_at' => (int) $account->getChangedTime(),
     ];
   }
 
