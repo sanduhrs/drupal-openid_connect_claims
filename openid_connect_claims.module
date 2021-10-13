@@ -11,9 +11,9 @@ use Drupal\file\Entity\File;
 /**
  * Implements hook_oauth2_server_user_claims().
  */
-function openid_connect_claims_oauth2_server_user_claims(object &$context) {
+function openid_connect_claims_oauth2_server_user_claims(array &$context) {
   /** @var \Drupal\user\UserInterface $account */
-  $account = $context->account;
+  $account = $context['account'];
   $user_sub_property = \Drupal::config('oauth2_server')->get('user_sub_property');
 
   // @todo Make this field configurable.
