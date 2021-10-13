@@ -5,73 +5,72 @@
  * Primary module hooks for OpenID Connect Claims module.
  */
 
-use Drupal\Core\Url;
-use Drupal\file\Entity\File;
-use Drupal\user\UserInterface;
-
 /**
  * Implements hook_oauth2_server_user_claims().
- *
- * @param array $claims
- *   An associative array of claim names and values.
- * @param string[] $requested_scopes
- *   An array of scope names.
- * @param \Drupal\user\UserInterface $account
- *   An account object.
- *
- * @throws \Drupal\Core\TypedData\Exception\MissingDataException
  */
-function openid_connect_claims_oauth2_server_user_claims(array $claims, array $requested_scopes, UserInterface $account) {
-  $user_sub_property = \Drupal::config('oauth2_server')->get('user_sub_property');
+function openid_connect_claims_oauth2_server_claims(\Drupal\user\UserInterface $account, array $requested_scopes) {
+  $claims = [
+    // @todo Make this field configurable.
+    'name' => $account->getAccountName(),
+  ];
 
-  // @todo Make this field configurable.
-  if ($picture = $account->get('user_picture')) {
-    /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $image */
-    $image = $picture->first();
-    $file = File::load($image->target_id);
-    $profile_picture_url = file_create_url($file->getFileUri());
+  // The profile scope.
+  // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
+  if (in_array('profile', $requested_scopes)) {
+    $claims += [
+      'email' => $account->getEmail(),
+      // @todo Make these fields configurable.
+      //'family_name' => '',
+      //'given_name' => '',
+      //'middle_name' => '',
+      'nickname' => $account->getAccountName(),
+      'preferred_username' => $account->getAccountName(),
+      'profile' => $account->toUrl('canonical', ['absolute' => TRUE]),
+      // @todo Make these fields configurable.
+      'picture' => '',
+      //'website' => '',
+      //'gender' => '',
+      //'birthdate' => '',
+      'zoneinfo' => $account->getTimeZone(),
+      'locale' => $account->getPreferredLangcode(),
+      'updated_at' => $account->getChangedTime(),
+    ];
   }
 
-  // Profile scope contains the following claims:
-  // family_name, given_name, middle_name, nickname, preferred_username,
-  // profile, picture, website, gender, birthdate, zoneinfo, locale, updated_at
-  // Email scope contains the following claims:
-  // email, email_verified
-  // Address scope contains the following claims:
-  // address (Substrings: formatted, street_address, locality, region, postal_code, country)
-  // Phone scope contains the following claims:
-  // phone_number, phone_number_verified
+  // The email scope.
   // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
+  if (in_array('profile', $requested_scopes)) {
+    $claims += [
+      'email' => $account->getEmail(),
+      'email_verified' => \Drupal::config('user.settings')->get('verify_mail'),
+    ];
+  }
 
-  $claims = [
-    'sub' => $account->get($user_sub_property),
-    'name' => $account->getDisplayName(),
-    // @todo Make this field configurable.
-    'given_name' => '',
-    // @todo Make this field configurable.
-    'family_name' => '',
-    // @todo Make this field configurable.
-    'middle_name' => '',
-    'nickname' => $account->getAccountName(),
-    'preferred_username' => $account->getAccountName(),
-    'profile' => Url::fromRoute('user.canonical')->setAbsolute(),
-    'picture' => $profile_picture_url ?: '',
-    // @todo Make this field configurable.
-    'website' => '',
-    'email' => $account->getEmail(),
-    'email_verified' => \Drupal::config('user.settings')->get('verify_mail'),
-    // @todo Make this field configurable.
-    'gender' => '',
-    // @todo Make this field configurable.
-    'birthdate' => '',
-    'zoneinfo' => $account->getTimeZone(),
-    'locale' => str_replace('_', '-', $account->getPreferredLangcode()),
-    // @todo Make this field configurable.
-    'phone_number' => '',
-    // @todo Make this field configurable.
-    'phone_number_verified' => '',
-    // @todo Make this field configurable.
-    'address' => '',
-    'updated_at' => $account->getChangedTime(),
-  ];
+  // The address scope.
+  // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
+  if (in_array('profile', $requested_scopes)) {
+    $claims += [
+      // @todo Make this field configurable.
+      //'address' => [
+      //  'formatted' => '',
+      //  'street_address' => '',
+      //  'locality' => '',
+      //  'region' => '',
+      //  'postal_code' => '',
+      //  'country' => '',
+      //],
+    ];
+  }
+
+  // The phone scope.
+  // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
+  if (in_array('profile', $requested_scopes)) {
+    $claims += [
+      // @todo Make this field configurable.
+      //'phone_number' => '',
+      //'phone_number_verified' => '',
+    ];
+  }
+
+  return $claims;
 }
