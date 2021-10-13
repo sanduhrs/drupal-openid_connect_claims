@@ -7,20 +7,21 @@
 
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\user\UserInterface;
 
 /**
  * Implements hook_oauth2_server_user_claims().
  *
- * @param $context
- *   - 'claims': contains a referenced array of claims.
- *   - 'account': contains the requesting account.
- *   - 'requested_scopes': contains the requested scopes.
+ * @param array $claims
+ *   An associative array of claim names and values.
+ * @param string[] $requested_scopes
+ *   An array of scope names.
+ * @param \Drupal\user\UserInterface $account
+ *   An account object.
  *
  * @throws \Drupal\Core\TypedData\Exception\MissingDataException
  */
-function openid_connect_claims_oauth2_server_user_claims(&$context) {
-  /** @var \Drupal\user\UserInterface $account */
-  $account = $context['account'];
+function openid_connect_claims_oauth2_server_user_claims(array $claims, array $requested_scopes, UserInterface $account) {
   $user_sub_property = \Drupal::config('oauth2_server')->get('user_sub_property');
 
   // @todo Make this field configurable.
@@ -42,7 +43,7 @@ function openid_connect_claims_oauth2_server_user_claims(&$context) {
   // phone_number, phone_number_verified
   // @see https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.5.4
 
-  $context['claims'] = [
+  $claims = [
     'sub' => $account->get($user_sub_property),
     'name' => $account->getDisplayName(),
     // @todo Make this field configurable.
